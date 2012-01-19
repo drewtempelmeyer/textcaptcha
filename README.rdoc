@@ -1,0 +1,62 @@
+= textcaptcha
+
+textcaptcha utilizies the textcaptcha.com API to help prevent SPAM. The idea behind the library is to be framework agnostic.
+
+== Configuring
+If you've not yet obtained an API key for textcaptcha.com, do so at http://textcaptcha.com/register.
+	Textcaptcha.configure do |config|
+		config.api_key = 'yourapikeyhere'
+	end
+
+== Retrieving a textCAPTCHA
+	captcha = Textcaptcha.obtain
+		# => { :question => "What's eight - 7?", :answers => [ "c4ca4238a0b923820dcc509a6f75849b", "f97c5d29941bfb1b2fdab0874906ab82" ] }
+
+== Validating an answer
+Validate the user's answer compared to the answers retrieved from Textcaptcha.obtain
+	captcha = Textcaptcha.obtain
+		# => { :question => "What's eight - 7?", :answers => [ "c4ca4238a0b923820dcc509a6f75849b", "f97c5d29941bfb1b2fdab0874906ab82" ] }
+	Textcaptcha.valid? 'sixteen', captcha[:answers]
+		# => false
+
+== Rails 3 Implementation
+Since textcaptcha remains framework agnostic, there's a bit more work to implement it, yet minimal.
+
+On the sign up form, retrieve the question and answer(s).
+	# app/controllers/users_controller.rb
+	# GET /users/new
+	def new
+		Textcaptcha.configure do |config|
+			config.api_key = 'yourapikeyhere'
+		end
+
+		captcha                   = Textcaptcha.obtain
+		session[:captcha_answers] = captcha[:answers]
+		@captcha_question         = captcha[:question]
+		@user                     = User.new
+	end
+
+	# POST /users
+	def create
+		user = User.new(params[:user])
+		if Textcaptcha.valid?(params[:captcha_answer], session[:captcha_answers]) && user.save
+			# ...
+		end
+	end
+
+In your view.
+	# app/views/users/new.html.erb
+	<%= label_tag 'captcha_answer', @captcha_question %>
+	<%= text_field_tag 'captcha_answer' %>
+
+== Contributing
+Be a hero in helping with the battle against spam.
+* Fork
+* Write test(s)
+* Implement
+* Submit pull request
+
+Or
+
+* Send me money
+
