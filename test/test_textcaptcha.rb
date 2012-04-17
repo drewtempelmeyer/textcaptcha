@@ -10,6 +10,12 @@ class TestTextcaptcha < Test::Unit::TestCase
 		assert_equal 'Array', response[:answers].class.to_s
 		assert_equal true, response[:answers].length > 0
 	end
+	
+	def test_repeated_obtain
+		response = Textcaptcha.obtain
+		response = Textcaptcha.obtain
+		assert_equal false, response[:question].nil?
+	end
 
 	def test_valid?
 		answers = [ Digest::MD5.hexdigest('three'), Digest::MD5.hexdigest('3') ]
