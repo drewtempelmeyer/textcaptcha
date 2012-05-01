@@ -20,7 +20,7 @@ module Textcaptcha
     #
     # Textcaptcha.obtain # => { :question => "What's eight - 7?", :answers => [ "c4ca4238a0b923820dcc509a6f75849b", "f97c5d29941bfb1b2fdab0874906ab82" ] }
     def obtain
-      api_response = HTTParty.get(URL << self.configuration.api_key)
+      api_response = HTTParty.get(URL + self.configuration.api_key)
       answers = api_response['captcha']['answer'].is_a?(String) ? [ api_response['captcha']['answer'] ] : api_response['captcha']['answer']
       { :question => api_response['captcha']['question'], :answers => answers }
     end
